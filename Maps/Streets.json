@@ -1,0 +1,12 @@
+{
+  "mapID": [ "tarkovstreets" ],
+  "x": 1245,
+  "y": 2413,
+  "scale": 4.565,
+  "mapLayers": [
+    {
+      "minHeight": -100,
+      "filename": "Maps\\Streets.png"
+    }
+  ]
+}

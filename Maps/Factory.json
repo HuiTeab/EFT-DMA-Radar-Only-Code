@@ -1,0 +1,19 @@
+{
+  "mapID": [
+  "factory4_day",
+  "factory4_night"
+  ],
+  "x": 1160,
+  "y": 1211,
+  "scale": 17.8,
+  "mapLayers": [
+    {
+      "minHeight": -100,
+      "filename": "Maps\\Factory_0f.png"
+    },
+    {
+      "minHeight": -0.8,
+      "filename": "Maps\\Factory_base.png"
+    }
+  ]
+}

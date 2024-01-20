@@ -1,0 +1,12 @@
+{
+  "mapID": ["shoreline"],
+  "x": 2209.8,
+  "y": 1198.8,
+  "scale": 1.662,
+  "mapLayers": [
+    {
+      "minHeight": -100,
+      "filename": "Maps\\Shoreline.png"
+    }
+  ]
+}

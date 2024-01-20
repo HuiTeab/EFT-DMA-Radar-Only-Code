@@ -1,0 +1,12 @@
+{
+  "mapID": ["woods"],
+  "x": 1255,
+  "y": 801,
+  "scale": 1.776,
+  "mapLayers": [
+    {
+      "minHeight": -100,
+      "filename": "Maps\\Woods.png"
+    }
+  ]
+}
