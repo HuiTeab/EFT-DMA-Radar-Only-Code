@@ -43,6 +43,10 @@ namespace eft_dma_radar
         {
             get => _game?.InHideout ?? false;
         }
+        public static bool IsScav
+        {
+            get => _game?.IsScav ?? false;
+        }
         public static string MapName
         {
             get => _game?.MapName;
@@ -55,6 +59,7 @@ namespace eft_dma_radar
         {
             get => _game?.Loot;
         }
+        
         public static ReadOnlyCollection<Grenade> Grenades
         {
             get => _game?.Grenades;

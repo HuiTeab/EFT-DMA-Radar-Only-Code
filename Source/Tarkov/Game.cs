@@ -23,6 +23,7 @@ namespace eft_dma_radar
         private volatile bool _loadingLoot = false;
         private volatile bool _refreshLoot = false;
         private volatile string _mapName = string.Empty;
+        private volatile bool _isScav = false;
         
         #region Getters
         public bool InGame
@@ -33,6 +34,10 @@ namespace eft_dma_radar
         public bool InHideout
         {
             get => _inHideout;
+        }
+        public bool IsScav
+        {
+            get => _isScav;
         }
         public string MapName
         {
@@ -287,7 +292,16 @@ namespace eft_dma_radar
                         continue;
                     }
                     var localPlayer = Memory.ReadPtr(_localGameWorld + 0x148);
-                    //check classname
+                    var localPlayerInfo = Memory.ReadPtrChain(localPlayer, new uint[] {0x588, 0x28});
+                    var localPlayeSide = Memory.ReadValue<int>(localPlayerInfo + 0x70);
+                    if (localPlayeSide == 4)
+                    {
+                        _isScav = true;
+                    }
+                    else
+                    {
+                        _isScav = false;
+                    }
                     var localPlayerClassnamePtr = Memory.ReadPtrChain(localPlayer, Offsets.UnityClass.Name);
                     var classNameString = Memory.ReadString(localPlayerClassnamePtr, 64).Replace("\0", string.Empty);
                     //Hideout handling
@@ -303,6 +317,8 @@ namespace eft_dma_radar
                     else if (classNameString == "ClientPlayer" || classNameString == "LocalPlayer")
                     {
                         _inHideout = false;
+                        // Check side
+                        //var side = Memory.ReadValue<int>(localPlayer + Offsets.LocalPlayer.Side);
                         var rgtPlayers = new RegisteredPlayers(Memory.ReadPtr(_localGameWorld + Offsets.LocalGameWorld.RegisteredPlayers));
                         // retry if player count is 0
                         if (rgtPlayers.PlayerCount == 0)

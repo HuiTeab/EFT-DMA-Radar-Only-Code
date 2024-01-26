@@ -79,7 +79,6 @@ namespace eft_dma_radar
         {
             get => Memory.Loot;
         }
-
         /// <summary>
         /// Contains all 'Hot' grenades in Local Game World, and their position(s).
         /// </summary>
@@ -1089,15 +1088,20 @@ namespace eft_dma_radar
                                             if (item.Container)
                                             {
                                                 //Add name to label
-                                                //Debug.WriteLine($"Drawing {item.Item}");
+                                                //Console.WriteLine($"Drawing {item.Item}");
                                                 var itemZoomedPos = item.Position
                                                     .ToMapPos(_selectedMap)
                                                     .ToZoomedPos(mapParams);
                                                 var conName = item.ContainerName;
-                                                if (conName == "Corpse") {
-                                                    Console.WriteLine("Corpse!!!");
-                                                }
                                                 var label = conName + GetItemLabel(item);
+                                                if (conName == "Corpse") {
+                                                    itemZoomedPos.DrawLoot(
+                                                        canvas,
+                                                        "Corpse",
+                                                        IsItemImportant(item),
+                                                        item.Position.Z - localPlayerMapPos.Height
+                                                    );
+                                                }
                                                 //var conName = item.ContainerName;
                                                 //Debug.WriteLine($"Drawing {item.Item.shortName}");
                                                 itemZoomedPos.DrawLoot(

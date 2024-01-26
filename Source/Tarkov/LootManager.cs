@@ -35,7 +35,7 @@ namespace eft_dma_radar {
         /// </summary>
         /// <param name="localGameWorld"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// 
+        ///
         public LootManager(ulong localGameWorld) {
             // If in hideout, don't parse loot
             if (IsAtHideout) {
@@ -48,6 +48,7 @@ namespace eft_dma_radar {
             var countLootListObjects = Memory.ReadValue < int > (lootListEntity + Offsets.UnityList.Count);
             if (countLootListObjects < 0 || countLootListObjects > 4096) throw new ArgumentOutOfRangeException("countLootListObjects"); // Loot list sanity check
             var loot = new List < LootItem > (countLootListObjects);
+            var lootCorpse = new List < Corpse > (countLootListObjects);
 
             var map = new ScatterReadMap();
             var round1 = map.AddRound();
@@ -77,20 +78,13 @@ namespace eft_dma_radar {
                         map.Results[i][4].Result is null ||
                         map.Results[i][6].Result is null) return;
 
-                    //Debug.WriteLine($"Result 0: {map.Results[i][0].Result}");
-                    //Debug.WriteLine($"Result 1: {map.Results[i][1].Result}");
-                    //Debug.WriteLine($"Result 2: {map.Results[i][2].Result}");
-                    //Debug.WriteLine($"Result 3: {map.Results[i][3].Result}");
-                    //Debug.WriteLine($"Result 4: {map.Results[i][4].Result}");
-                    //Debug.WriteLine($"Result 5: {map.Results[i][5].Result}");
-                    //Debug.WriteLine($"Result(NAME) 6: {map.Results[i][6].Result}");
                     var interactiveClass = (ulong) map.Results[i][2].Result;
                     var gameObject = (ulong) map.Results[i][4].Result;
                     var name = (string) map.Results[i][6].Result;
                     var classNamePtr = Memory.ReadPtrChain(interactiveClass, Offsets.UnityClass.Name);
                     var classNameString = Memory.ReadString(classNamePtr, 64);
 
-                    //Console.WriteLine($"Name: {name}, Class: {classNameString}");
+                    // Create cache entry
                     
 
                     if (name.Contains("script", StringComparison.OrdinalIgnoreCase)) {
@@ -98,6 +92,7 @@ namespace eft_dma_radar {
                     } 
                     // Check if the object is a container
                     else if (_containers.Contains(name)) {
+                        //ContainerEntity->ItemOwner->RootItem->Grids[]->ContainedItems->Grid Dictionary (unity::c_Dictionary<unity::c_item*, c_LocationInGrid*>)
                         var friendlyName = ContainerMappings.NameMap.TryGetValue(name, out var label) ? label : "Unknown Container";
                         //Get Position
                         var objectClass = Memory.ReadPtr(gameObject + Offsets.GameObject.ObjectClass);
@@ -121,11 +116,8 @@ namespace eft_dma_radar {
                                 return;
                             }
                             var itemOwner = Memory.ReadPtr(interactiveClass + Offsets.LootInteractiveClass.ContainerItemOwner);
-                            //Debug.WriteLine($"Item Owner: {itemOwner}");
                             var itemBase = Memory.ReadPtr(itemOwner + 0xC0); //Offsets.ContainerItemOwner.LootItemBase);
-                            //Debug.WriteLine($"Item Base: {itemBase}");
                             var grids = Memory.ReadPtr(itemBase + Offsets.LootItemBase.Grids);
-                            //Debug.WriteLine($"Grids: {grids}");
                             GetItemsInGrid(grids, "ignore", pos, loot, true, friendlyName);
                         } catch {}
                     }
@@ -134,19 +126,20 @@ namespace eft_dma_radar {
                         var item = Memory.ReadPtr(interactiveClass + 0xB0); //EFT.InventoryLogic.Item
                         var itemTemplate = Memory.ReadPtr(item + Offsets.LootItemBase.ItemTemplate); //EFT.InventoryLogic.ItemTemplate
                         bool questItem = Memory.ReadValue < bool > (itemTemplate + Offsets.ItemTemplate.IsQuestItem);
-
-                        //if (questItem) {
-                        //    Debug.WriteLine($"Quest Item: {name}");
-                        //}
-                        //else {
+                        if (questItem) {
+                            //These are quest items
+                            //Not to be confused with found in raid items
+                        }
+                        else {
                             var objectClass = Memory.ReadPtr(gameObject + Offsets.GameObject.ObjectClass);
                             var transformInternal = Memory.ReadPtrChain(objectClass, Offsets.LootGameObjectClass.To_TransformInternal);
                             var pos = new Transform(transformInternal).GetPosition();
                             var BSGIdPtr = Memory.ReadPtr(itemTemplate + Offsets.ItemTemplate.BsgId);
                             var id = Memory.ReadUnityString(BSGIdPtr);
-                            //Debug.WriteLine($"Loot: {name} at {pos} with ID {id}");
+                            if (id == null) return;
                             try {
                                     var grids = Memory.ReadPtr(item + Offsets.LootItemBase.Grids);
+                                    var count = new MemArray(grids).Count;
                                     GetItemsInGrid(grids, id, pos, loot, false , "Loose Loot");
                                 } catch {
                                     //The loot item we found does not have any grids so it's basically like a keycard or a ledx etc. Therefore add it to our loot dictionary.
@@ -162,29 +155,51 @@ namespace eft_dma_radar {
                                     }
                                 }
                         
-                        //}
+                        }
 
                     }
                     else if (classNameString == "ObservedCorpse") {
-                        //Console.WriteLine($"Corpse: {name}");
-                        //Console.WriteLine("Corpse Class: " + classNameString);
-                        var corpseItem = Memory.ReadPtrChain(interactiveClass, new uint[] { 0x40, 0xC0}); // EFT.InventoryLogic.Item
-                        var corpseItemTemplate = Memory.ReadPtr(corpseItem + Offsets.LootItemBase.ItemTemplate); // EFT.InventoryLogic.ItemTemplate
-                        var corpseItemTemplateBSGIdPtr = Memory.ReadPtr(corpseItemTemplate + Offsets.ItemTemplate.BsgId);
-                        var id = Memory.ReadUnityString(corpseItemTemplateBSGIdPtr);
+                        if (interactiveClass == 0x0) return;
+                        var itemOwner = Memory.ReadPtr(interactiveClass + 0x40); //[40] ItemOwner : -.GClass24D0
+                        var rootItem = Memory.ReadPtr(itemOwner + 0xC0); //[C0] item_0xC0 : EFT.InventoryLogic.Item
+                        var slots = Memory.ReadPtr(rootItem + 0x78);
+                        var slotsArray = new MemArray(slots);
                         var objectClass = Memory.ReadPtr(gameObject + Offsets.GameObject.ObjectClass);
                         var transformInternal = Memory.ReadPtrChain(objectClass, Offsets.LootGameObjectClass.To_TransformInternal);
                         var pos = new Transform(transformInternal).GetPosition();
-                        //loot.Add(new LootItem{
-                        //    Position = pos,
-                        //    Label = "Corpse",
-                        //   AlwaysShow = true,
-                        //    Important = true,
-                        //    Container = true,
-                        //    ContainerName = "Corpse"
-//
-                        //});
+                        foreach(var slot in slotsArray.Data) {
+                            try {
+                                var containedItem = Memory.ReadPtr(slot + 0x40);
+                                if (containedItem == 0x0){
+                                    continue;
+                                }
+                                var itemTemplate = Memory.ReadPtr(containedItem + Offsets.LootItemBase.ItemTemplate); //EFT.InventoryLogic.ItemTemplate
+                                var BSGIdPtr = Memory.ReadPtr(itemTemplate + Offsets.ItemTemplate.BsgId);
+                                var id = Memory.ReadUnityString(BSGIdPtr);
+                                var corpseItemNamePtr = Memory.ReadPtr(itemTemplate + 0x58);
+                                var corpseItemName = Memory.ReadUnityString(corpseItemNamePtr);
+                                var grids = Memory.ReadPtr(containedItem + Offsets.LootItemBase.Grids);
+                                if (grids == 0x0){
+                                    //The loot item we found does not have any grids so it's weapon slot?
+                                    if (TarkovMarketManager.AllItems.TryGetValue(id, out
+                                            var entry)) {
+                                        loot.Add(new LootItem {
+                                            Label = entry.Label,
+                                                AlwaysShow = entry.AlwaysShow,
+                                                Important = entry.Important,
+                                                Position = pos,
+                                                Item = entry.Item,
+                                                Container = true,
+                                                ContainerName = "Corpse"
+                                        });
+                                    }
+                                };
+                                GetItemsInGrid(grids, id, pos, loot, true, "Corpse");
+                            } catch {
+                                continue;
+                            }
 
+                        }
 
                     }
 
@@ -310,14 +325,8 @@ namespace eft_dma_radar {
                         ContainerName = containerName,
                 });
             }
-            if (containerName == "Corpse") {
-                //Console.WriteLine($"Corpse: {containerName} at {pos} with ID {id}, starting grid search...");
-            }
-
             // Check all sections of the container
             foreach(var grid in gridsArray.Data) {
-                //Debug.WriteLine($"Starting Grid Check...");
-
                 var gridEnumerableClass = Memory.ReadPtr(grid + Offsets.Grids.GridsEnumerableClass); // -.GClass178A->gClass1797_0x40 // Offset: 0x0040 (Type: -.GClass1797)
                 var itemListPtr = Memory.ReadPtr(gridEnumerableClass + 0x18); // -.GClass1797->list_0x18 // Offset: 0x0018 (Type: System.Collections.Generic.List<Item>)
                 var itemList = new MemList(itemListPtr);
@@ -451,6 +460,29 @@ namespace eft_dma_radar {
             init;
         }
 
+    }
+
+    public class Corpse {
+        public string Label {
+            get;
+            init;
+        }
+        public bool Important {
+            get;
+            init;
+        } = false;
+        public Vector3 Position {
+            get;
+            init;
+        }
+        public bool AlwaysShow {
+            get;
+            init;
+        } = false;
+        public string BsgId {
+            get;
+            init;
+        }
     }
     #endregion
 }

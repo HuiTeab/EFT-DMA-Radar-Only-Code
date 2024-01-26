@@ -12,6 +12,11 @@ namespace eft_dma_radar
         {
             get => Memory.InHideout;
         }
+
+        private bool IsScav
+        {
+            get => Memory.IsScav;
+        }
         private readonly Stopwatch _sw = new();
         /// <summary>
         /// List of PMC Exfils in Local Game World and their position/status.
@@ -28,7 +33,12 @@ namespace eft_dma_radar
             }
             // Get ExfilController
             var exfilController = Memory.ReadPtr(localGameWorld + Offsets.LocalGameWorld.ExfilController);
-            var exfilPoints = Memory.ReadPtr(exfilController + Offsets.ExfilController.ExfilList);
+            ulong exfilPoints;
+            if (IsScav) {
+                exfilPoints = Memory.ReadPtr(exfilController + 0x28);
+            }else {
+                exfilPoints = Memory.ReadPtr(exfilController + Offsets.ExfilController.ExfilList);
+            }
             //var exfilPoints = Memory.ReadPtr(exfilController + 0x28);
             //var scavExfilPoints = Memory.ReadPtr(exfilController + 0x28);
             var count = Memory.ReadValue<int>(exfilPoints + Offsets.ExfilController.ExfilCount);
