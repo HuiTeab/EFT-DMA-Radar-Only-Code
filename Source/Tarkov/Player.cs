@@ -346,7 +346,7 @@ namespace eft_dma_radar
                     Lvl = GetPlayerLevel();
                     //Category = GetMemberCategory();
                     IsLocalPlayer = true;
-                    //try { _gearManager = new GearManager(playerBase, false); } catch { }
+                    try { _gearManager = new GearManager(playerBase, false); } catch { }
                     IsPmc = true;
 
                 } else if (baseClassName == "ObservedPlayerView") {
@@ -362,7 +362,7 @@ namespace eft_dma_radar
                     var playerSide = GetNextObservedPlayerSide();
                     var playerIsAI = GetNextObservedPlayerIsAI();
                     // Check corpse ptr
-                    //try { _gearManager = new GearManager(playerBase, false); } catch { }
+                    try { _gearManager = new GearManager(playerBase, false); } catch { }
                     if (nameTranslations.ContainsKey(Name))
                     {
                         Name = nameTranslations[Name];
@@ -387,12 +387,10 @@ namespace eft_dma_radar
                         }
                         else {
                             Type = PlayerType.AIScav;
-                            ObservedPlayerView = playerBase;
-                            MovementContext = Memory.ReadPtrChain(ObservedPlayerView, Offsets.ObservedPlayerView.To_MovementContext);
-                            TransformInternal = Memory.ReadPtrChain(ObservedPlayerView, Offsets.ObservedPlayerView.To_TransformInternal);
-                            _transform = new Transform(TransformInternal, true);
-                            // Check different movement context and transform for Scavs
-                            //MovementContext = Memory.ReadPtr(ObservedPlayerView + 0x28);
+                            //ObservedPlayerView = playerBase;
+                            //MovementContext = Memory.ReadPtrChain(ObservedPlayerView, Offsets.ObservedPlayerView.To_MovementContext);
+                            //TransformInternal = Memory.ReadPtrChain(ObservedPlayerView, Offsets.ObservedPlayerView.To_TransformInternal);
+                            //_transform = new Transform(TransformInternal, true);
                         }
                     }
 

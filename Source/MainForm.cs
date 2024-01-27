@@ -459,7 +459,7 @@ namespace eft_dma_radar
                         foreach (var bitmap in _loadedBitmaps)
                             bitmap?.Dispose(); // Cleanup resources
                     }
-                    _loadedBitmaps = new SKBitmap[_selectedMap.ConfigFile.MapID.Count];
+                    _loadedBitmaps = new SKBitmap[_selectedMap.ConfigFile.MapLayers.Count];
                     for (int i = 0; i < _loadedBitmaps.Length; i++)
                     {
                         using (
@@ -657,7 +657,7 @@ namespace eft_dma_radar
             try
             {
                 _selectedMap = _maps[0];
-                _loadedBitmaps = new SKBitmap[_selectedMap.ConfigFile.MapID.Count];
+                _loadedBitmaps = new SKBitmap[_selectedMap.ConfigFile.MapLayers.Count];
                 for (int i = 0; i < _loadedBitmaps.Length; i++)
                 {
                     using (
@@ -855,35 +855,6 @@ namespace eft_dma_radar
                     string title = "EFT Radar";
                     if (inGame && localPlayer is not null)
                     {
-                        foreach (var map in _maps)
-                        {
-                            //Debug.WriteLine($"Current map: {currentMap.ToLower()}");
-                            //Debug.WriteLine($"Map: {map.Name.ToLower()}");
-                            if (map.Name.ToLower() == currentMap.ToLower())
-                            {
-                                _selectedMap = map;
-                                //Debug.WriteLine($"Selected Map: {_selectedMap.Name.ToLower()}");
-                                //init map
-                            }
-                            else if (currentMap.ToLower() == "tarkovstreets")
-                            {
-                                var streets = _maps.FirstOrDefault(
-                                    x => x.Name.ToLower() == "streets"
-                                );
-                                _selectedMap = streets;
-                            }
-                            else if (currentMap.ToLower() == "bigmap")
-                            {
-                                _selectedMap = map.Name.ToLower() == "customs" ? map : _selectedMap;
-                            }
-                            else if (currentMap.ToLower() == "rezervbase")
-                            {
-                                var reserve = _maps.FirstOrDefault(
-                                    x => x.Name.ToLower() == "reserve"
-                                );
-                                _selectedMap = reserve;
-                            }
-                        }
                         if (_selectedMap is null)
                             _selectedMap = _maps[0];
                         //init map
@@ -892,7 +863,7 @@ namespace eft_dma_radar
                             foreach (var bitmap in _loadedBitmaps)
                                 bitmap?.Dispose(); // Cleanup resources
                         }
-                        _loadedBitmaps = new SKBitmap[_selectedMap.ConfigFile.MapID.Count];
+                        _loadedBitmaps = new SKBitmap[_selectedMap.ConfigFile.MapLayers.Count];
                         for (int i = 0; i < _loadedBitmaps.Length; i++)
                         {
                             using (
@@ -931,9 +902,6 @@ namespace eft_dma_radar
                         // Get main player location
                         var localPlayerPos = localPlayer.Position;
                         var localPlayerMapPos = localPlayerPos.ToMapPos(_selectedMap);
-
-                        //Debug.WriteLine($"Game State: IsReady={isReady}, InGame={inGame}, LocalPlayerExists={localPlayer != null}");
-                        //Debug.WriteLine($"Game State: IsReady={isReady}, InGame={inGame}, LocalPlayerExists={localPlayer != null}");
 
                         if (groupBox_MapSetup.Visible) // Print coordinates (to make it easy to setup JSON configs)
                         {
@@ -1087,8 +1055,10 @@ namespace eft_dma_radar
                                         {
                                             if (item.Container)
                                             {
-                                                //Add name to label
-                                                //Console.WriteLine($"Drawing {item.Item}");
+                                                //If there is item already drawn at this position, then add new item value to it and draw only container name and value
+                                                
+
+
                                                 var itemZoomedPos = item.Position
                                                     .ToMapPos(_selectedMap)
                                                     .ToZoomedPos(mapParams);
@@ -1102,8 +1072,6 @@ namespace eft_dma_radar
                                                         item.Position.Z - localPlayerMapPos.Height
                                                     );
                                                 }
-                                                //var conName = item.ContainerName;
-                                                //Debug.WriteLine($"Drawing {item.Item.shortName}");
                                                 itemZoomedPos.DrawLoot(
                                                     canvas,
                                                     label,
@@ -1265,6 +1233,14 @@ namespace eft_dma_radar
                         else if (!inGame)
                             canvas.DrawText(
                                 "Waiting for Raid Start...",
+                                _mapCanvas.Width / 2,
+                                _mapCanvas.Height / 2,
+                                SKPaints.TextRadarStatus
+                            );
+                        //loading loot check
+                        else if (LoadingLoot)
+                            canvas.DrawText(
+                                "Loading Loot...",
                                 _mapCanvas.Width / 2,
                                 _mapCanvas.Height / 2,
                                 SKPaints.TextRadarStatus

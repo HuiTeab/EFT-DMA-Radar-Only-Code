@@ -149,9 +149,7 @@ namespace eft_dma_radar
             {
                 //All other players
                 var ObservedPlayerView = playerBase;
-                var profileIDprt = Memory.ReadPtr(
-                    ObservedPlayerView + Offsets.ObservedPlayerView.ID
-                );
+                var profileIDprt = Memory.ReadPtr(ObservedPlayerView + Offsets.ObservedPlayerView.ID);
                 var profileID = Memory.ReadUnityString(profileIDprt);
                 id = profileID;
             }

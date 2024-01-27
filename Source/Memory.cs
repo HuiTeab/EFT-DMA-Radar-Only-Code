@@ -59,7 +59,6 @@ namespace eft_dma_radar
         {
             get => _game?.Loot;
         }
-        
         public static ReadOnlyCollection<Grenade> Grenades
         {
             get => _game?.Grenades;

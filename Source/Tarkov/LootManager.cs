@@ -169,8 +169,13 @@ namespace eft_dma_radar {
                         var pos = new Transform(transformInternal).GetPosition();
                         foreach(var slot in slotsArray.Data) {
                             try {
+                                var namePtr = Memory.ReadPtr(slot + Offsets.Slot.Name);
+                                var slotName = Memory.ReadUnityString(namePtr);
                                 var containedItem = Memory.ReadPtr(slot + 0x40);
                                 if (containedItem == 0x0){
+                                    continue;
+                                }
+                                if (slotName == "SecuredContainer"){
                                     continue;
                                 }
                                 var itemTemplate = Memory.ReadPtr(containedItem + Offsets.LootItemBase.ItemTemplate); //EFT.InventoryLogic.ItemTemplate
@@ -179,6 +184,7 @@ namespace eft_dma_radar {
                                 var corpseItemNamePtr = Memory.ReadPtr(itemTemplate + 0x58);
                                 var corpseItemName = Memory.ReadUnityString(corpseItemNamePtr);
                                 var grids = Memory.ReadPtr(containedItem + Offsets.LootItemBase.Grids);
+                                var containerName = "Corpse" + slotName;
                                 if (grids == 0x0){
                                     //The loot item we found does not have any grids so it's weapon slot?
                                     if (TarkovMarketManager.AllItems.TryGetValue(id, out
@@ -190,11 +196,11 @@ namespace eft_dma_radar {
                                                 Position = pos,
                                                 Item = entry.Item,
                                                 Container = true,
-                                                ContainerName = "Corpse"
+                                                ContainerName = containerName
                                         });
                                     }
                                 };
-                                GetItemsInGrid(grids, id, pos, loot, true, "Corpse");
+                                GetItemsInGrid(grids, id, pos, loot, true, containerName);
                             } catch {
                                 continue;
                             }
