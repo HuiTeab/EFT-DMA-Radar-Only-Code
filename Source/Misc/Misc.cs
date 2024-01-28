@@ -436,12 +436,15 @@ namespace eft_dma_radar
         /// </summary>
         public readonly string ConfigFilePath;
 
-        public Map(string name, MapConfig config, string configPath)
+        public Map(string name, MapConfig config, string configPath, string mapID)
         {
             Name = name;
             ConfigFile = config;
             ConfigFilePath = configPath;
+            MapID = mapID;
         }
+
+        public readonly string MapID;
     }
 
     /// <summary>

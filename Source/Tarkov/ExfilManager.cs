@@ -31,24 +31,58 @@ namespace eft_dma_radar
                 Debug.WriteLine("In Hideout, not loading exfils.");
                 return;
             }
-            // Get ExfilController
+            var list = new List<Exfil>();
+
             var exfilController = Memory.ReadPtr(localGameWorld + Offsets.LocalGameWorld.ExfilController);
+
             ulong exfilPoints;
             if (IsScav) {
                 exfilPoints = Memory.ReadPtr(exfilController + 0x28);
+
+                var count = Memory.ReadValue<int>(exfilPoints + Offsets.ExfilController.ExfilCount);
+                if (count < 1 || count > 24) throw new ArgumentOutOfRangeException();
+                for (uint i = 0; i < count; i++)
+                {
+                    var exfilAddr = Memory.ReadPtr(exfilPoints + Offsets.UnityListBase.Start + (i * 0x08));
+                    var exfil = new Exfil(exfilAddr);
+                    list.Add(exfil);
+                }
             }else {
+                var localPlayer = Memory.ReadPtr(localGameWorld + Offsets.LocalGameWorld.MainPlayer);
+                Console.WriteLine($"LocalPlayer: {localPlayer:X}");
+                var classNamePtr = Memory.ReadPtrChain(localPlayer, Offsets.UnityClass.Name);
+                var classNameString = Memory.ReadString(classNamePtr, 64).Replace("\0", string.Empty);
+                Console.WriteLine($"LocalPlayerClass: {classNameString}");
+                var localPlayerProfile = Memory.ReadPtr(localPlayer + Offsets.Player.Profile);
+                Console.WriteLine($"LocalPlayerProfile: {localPlayerProfile:X}");
+                var localPlayerInfo = Memory.ReadPtr(localPlayerProfile + Offsets.Profile.PlayerInfo);
+                Console.WriteLine($"LocalPlayerInfo: {localPlayerInfo:X}");
+                var localPlayerEntryPoint = Memory.ReadPtr(localPlayerInfo + 0x30);
+                Console.WriteLine($"LocalPlayerEntryPoint: {localPlayerEntryPoint:X}");
+                var localPlayerEntryPointString = Memory.ReadUnityString(localPlayerEntryPoint);
+                Console.WriteLine($"LocalPlayerEntryPointString: {localPlayerEntryPointString}");
+
+
                 exfilPoints = Memory.ReadPtr(exfilController + Offsets.ExfilController.ExfilList);
-            }
-            //var exfilPoints = Memory.ReadPtr(exfilController + 0x28);
-            //var scavExfilPoints = Memory.ReadPtr(exfilController + 0x28);
-            var count = Memory.ReadValue<int>(exfilPoints + Offsets.ExfilController.ExfilCount);
-            if (count < 1 || count > 24) throw new ArgumentOutOfRangeException();
-            var list = new List<Exfil>();
-            for (uint i = 0; i < count; i++)
-            {
-                var exfilAddr = Memory.ReadPtr(exfilPoints + Offsets.UnityListBase.Start + (i * 0x08));
-                var exfil = new Exfil(exfilAddr);
-                list.Add(exfil);
+                var count = Memory.ReadValue<int>(exfilPoints + Offsets.ExfilController.ExfilCount);
+                if (count < 1 || count > 24) throw new ArgumentOutOfRangeException();
+                for (uint i = 0; i < count; i++)
+                {
+                    var exfilAddr = Memory.ReadPtr(exfilPoints + Offsets.UnityListBase.Start + (i * 0x8));
+                    var eligibleEntryPoints = Memory.ReadPtr(exfilAddr + 0x80);
+                    var eligibleEntryPointsCount = Memory.ReadValue<int>(eligibleEntryPoints + 0x18);
+                    for (uint j = 0; j < eligibleEntryPointsCount; j++)
+                    {
+                        var entryPoint = Memory.ReadPtr(eligibleEntryPoints + 0x20 + (j * 0x8));
+                        var entryPointString = Memory.ReadUnityString(entryPoint);
+                        if (entryPointString.ToLower() == localPlayerEntryPointString.ToLower())
+                        {
+                            var exfil = new Exfil(exfilAddr);
+                            list.Add(exfil);
+                            break;
+                        }
+                    }
+                }
             }
             Exfils = new(list); // update readonly ref
             UpdateExfils(); // Get initial statuses

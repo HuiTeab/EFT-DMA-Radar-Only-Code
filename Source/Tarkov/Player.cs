@@ -330,8 +330,6 @@ namespace eft_dma_radar
                     //Debug.WriteLine($"Base Class Name: {baseClassName}");
                 }
                 if (baseClassName == "ClientPlayer" || baseClassName == "LocalPlayer" || baseClassName == "HideoutPlayer") {
-                    
-                    Debug.WriteLine("Processing Local Player.");
                     ulong localPlayerInfoOffset = playerProfile + Offsets.Profile.PlayerInfo;
                     Info = Memory.ReadPtr(localPlayerInfoOffset);
                     MovementContext = Memory.ReadPtr(playerBase + Offsets.Player.MovementContext);
@@ -380,17 +378,12 @@ namespace eft_dma_radar
                     else if (playerSide == 4 && playerIsAI == false) {
                         Type = PlayerType.PScav;
                     } else if (playerSide == 4 && playerIsAI == true) {
-                        //Type = PlayerType.AIScav;
                         if (nameTranslations.ContainsKey(nameForBossCheck))
                         {
                             Type = PlayerType.AIBoss;
                         }
                         else {
                             Type = PlayerType.AIScav;
-                            //ObservedPlayerView = playerBase;
-                            //MovementContext = Memory.ReadPtrChain(ObservedPlayerView, Offsets.ObservedPlayerView.To_MovementContext);
-                            //TransformInternal = Memory.ReadPtrChain(ObservedPlayerView, Offsets.ObservedPlayerView.To_TransformInternal);
-                            //_transform = new Transform(TransformInternal, true);
                         }
                     }
 

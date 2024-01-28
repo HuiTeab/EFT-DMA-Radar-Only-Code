@@ -642,9 +642,8 @@ namespace eft_dma_radar
                 //Debug.WriteLine($"Loading Map: {name}");
                 var mapConfig = MapConfig.LoadFromFile(config.FullName); // Assuming LoadFromFile is updated to handle new JSON format
                 //Add map ID to map config
-                var map = new Map(name.ToUpper(), mapConfig, config.FullName);
-                //Debug.WriteLine($"Loaded Map: {map.Name}");
-
+                var mapID = mapConfig.MapID[0];
+                var map = new Map(name.ToUpper(), mapConfig, config.FullName, mapID);
                 // Assuming map.ConfigFile now has a 'mapLayers' property that is a List of a new type matching the JSON structure
                 map.ConfigFile.MapLayers = map.ConfigFile
                     .MapLayers
@@ -855,8 +854,16 @@ namespace eft_dma_radar
                     string title = "EFT Radar";
                     if (inGame && localPlayer is not null)
                     {
-                        if (_selectedMap is null)
+                        if (_selectedMap is null){
                             _selectedMap = _maps[0];
+                        }
+                        // Check if map changed
+                        if (currentMap.ToLower() != _selectedMap.MapID.ToLower())
+                        {
+                            _selectedMap = _maps.FirstOrDefault(x => x.MapID.ToLower() == currentMap.ToLower());
+                            if (_selectedMap is null)
+                                throw new Exception($"ERROR: Map '{currentMap}' not found!");
+                        }
                         //init map
                         if (_loadedBitmaps is not null)
                         {

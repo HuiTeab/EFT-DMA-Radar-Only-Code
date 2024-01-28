@@ -367,8 +367,8 @@ namespace eft_dma_radar
                 _loadingLoot = true;
                 try
                 {
-                    var loot = new LootManager(_localGameWorld);
-                    _lootManager = loot; // update ref
+                    //var loot = new LootManager(_localGameWorld);
+                    //_lootManager = loot; // update ref
                     _refreshLoot = false;
                 }
                 catch (Exception ex)
