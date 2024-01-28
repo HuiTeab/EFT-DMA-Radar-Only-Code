@@ -39,8 +39,7 @@ EFT DMA Radar is a radar tool designed for Escape from Tarkov that provides real
 ## Contact
 
 For any inquiries or assistance, feel free to contact me on Discord:
-
-[keeegi]: keeegi_10477
+keeegi_10477
 
 ## Note
 
