@@ -49,18 +49,18 @@ namespace eft_dma_radar
                 }
             }else {
                 var localPlayer = Memory.ReadPtr(localGameWorld + Offsets.LocalGameWorld.MainPlayer);
-                Console.WriteLine($"LocalPlayer: {localPlayer:X}");
+                //Console.WriteLine($"LocalPlayer: {localPlayer:X}");
                 var classNamePtr = Memory.ReadPtrChain(localPlayer, Offsets.UnityClass.Name);
                 var classNameString = Memory.ReadString(classNamePtr, 64).Replace("\0", string.Empty);
-                Console.WriteLine($"LocalPlayerClass: {classNameString}");
+                //Console.WriteLine($"LocalPlayerClass: {classNameString}");
                 var localPlayerProfile = Memory.ReadPtr(localPlayer + Offsets.Player.Profile);
-                Console.WriteLine($"LocalPlayerProfile: {localPlayerProfile:X}");
+                //Console.WriteLine($"LocalPlayerProfile: {localPlayerProfile:X}");
                 var localPlayerInfo = Memory.ReadPtr(localPlayerProfile + Offsets.Profile.PlayerInfo);
-                Console.WriteLine($"LocalPlayerInfo: {localPlayerInfo:X}");
+                //Console.WriteLine($"LocalPlayerInfo: {localPlayerInfo:X}");
                 var localPlayerEntryPoint = Memory.ReadPtr(localPlayerInfo + 0x30);
-                Console.WriteLine($"LocalPlayerEntryPoint: {localPlayerEntryPoint:X}");
+                //Console.WriteLine($"LocalPlayerEntryPoint: {localPlayerEntryPoint:X}");
                 var localPlayerEntryPointString = Memory.ReadUnityString(localPlayerEntryPoint);
-                Console.WriteLine($"LocalPlayerEntryPointString: {localPlayerEntryPointString}");
+                //Console.WriteLine($"LocalPlayerEntryPointString: {localPlayerEntryPointString}");
 
 
                 exfilPoints = Memory.ReadPtr(exfilController + Offsets.ExfilController.ExfilList);

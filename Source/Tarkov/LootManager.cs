@@ -129,6 +129,11 @@ namespace eft_dma_radar {
                         if (questItem) {
                             //These are quest items
                             //Not to be confused with found in raid items
+                            //var spawnedIn = Memory.ReadValue<bool>(item + 0x6C);
+                            //Console.WriteLine("Quest Item spawned: " + spawnedIn);
+                            //var itemName = Memory.ReadUnityString(itemTemplate + 0x10);
+                            //Console.WriteLine("Q Item name: "+ itemName);
+
                         }
                         else {
                             var objectClass = Memory.ReadPtr(gameObject + Offsets.GameObject.ObjectClass);

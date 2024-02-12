@@ -98,7 +98,7 @@
         public const uint ID = 0x40; // to UnityString
         public const uint NickName = 0x48; // to UnityString
         public const uint ObservedPlayerController = 0x80; // to PlayerController
-        public static readonly uint[] To_MovementContext = new uint[] { 0x80, 0xE8, 0x10}; // to MovementContext
+        public static readonly uint[] To_MovementContext = new uint[] { 0x80, 0xC8, 0x10}; // to MovementContext
         public static readonly uint[] To_TransformInternal = new uint[] { 0x60, 0x28, 0x28, 0x10, 0x20, 0x10 }; // to TransformInternal
     }
 
@@ -182,7 +182,7 @@
     {
         public const uint LootBaseObject = 0x10; // to LootBaseObject
         public const uint LootItemBase = 0x50; // to LootItemBase
-        public const uint ContainerItemOwner = 0x110; // to ContainerItemOwner
+        public const uint ContainerItemOwner = 0x120; // to ContainerItemOwner
     }
     public struct LootItemBase //EFT.InventoryLogic.Item
     {
