@@ -91,7 +91,7 @@
         public const uint MemberCategory = 0x8C; // int32 enum
         public const uint Experience = 0x90; // int32
     }
-    public struct ObservedPlayerView // EFT.NextObservedPlayer ( ObservedPlayerView : MonoBehaviour, IPlayer )
+    public struct ObservedPlayerView // [Class] EFT.NextObservedPlayer.ObservedPlayerView : MonoBehaviour
     {
         public const uint PlayerSide = 0xF0; // int32
         public const uint IsAI = 0x109; // bool
@@ -105,6 +105,8 @@
     public struct ObservedPlayerController //[Class] -.GClass1E0D : Object, GInterface94D4, IDisposable
     {
         public const uint InfoContainer = 0xE0; // to InfoContainer
+
+        public const uint InventoryController = 0x118; // to InventoryController
         public static readonly uint[] To_MovementContext = new uint[] { 0xC0, 0x10}; // to MovementContext
         
     }
@@ -136,7 +138,7 @@
     }
     public struct InventoryController // -.GClass1A98
     {
-        public const uint Inventory = 0x130; // to Inventory
+        public const uint Inventory = 0x138; // to Inventory
     }
     public struct Inventory
     {

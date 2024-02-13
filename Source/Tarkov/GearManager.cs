@@ -15,27 +15,27 @@ namespace eft_dma_radar
         /// </summary>
         public ReadOnlyDictionary<string, GearItem> Gear { get; }
 
-        public GearManager(ulong playerBase, bool isPMC)
+        public GearManager(ulong playerBase, bool isPMC, bool isLocal)
         {
-
-            Debug.WriteLine("GearManager: Initializing...");
-
-            //foreach (var item in TarkovMarketManager.AllItems)
-            //{
-            //    //Debug.WriteLine($"GearManager: TarkovMarketManager.AllItems: {item}");
-            //}
-
-            var inventorycontroller = Memory.ReadPtr(playerBase + Offsets.Player.InventoryController);
-            //Debug.WriteLine($"GearManager: InventoryController: 0x{inventorycontroller:X}");
-            var inventory = Memory.ReadPtr(inventorycontroller + Offsets.InventoryController.Inventory);
-            //Debug.WriteLine($"GearManager: Inventory: 0x{inventory:X}");
-            var equipment = Memory.ReadPtr(inventory + Offsets.Inventory.Equipment);
-            //Debug.WriteLine($"GearManager: Equipment: 0x{equipment:X}");
-            var slots = Memory.ReadPtr(equipment + Offsets.Equipment.Slots);
-            //Debug.WriteLine($"GearManager: Slots: 0x{slots:X}");
-            var size = Memory.ReadValue<int>(slots + Offsets.UnityList.Count);
-            //Debug.WriteLine($"GearManager: Slots Size: {size}");
+            var size = 0;
+            var slots = 0UL;
             var slotDict = new Dictionary<string, ulong>(StringComparer.OrdinalIgnoreCase);
+            if (isLocal){
+                var inventorycontroller = Memory.ReadPtr(playerBase + Offsets.Player.InventoryController);
+                var inventory = Memory.ReadPtr(inventorycontroller + Offsets.InventoryController.Inventory);
+                var equipment = Memory.ReadPtr(inventory + Offsets.Inventory.Equipment);
+                slots = Memory.ReadPtr(equipment + Offsets.Equipment.Slots);
+                size = Memory.ReadValue<int>(slots + Offsets.UnityList.Count);
+
+            } else {
+                var observedPlayerController = Memory.ReadPtr(playerBase + Offsets.ObservedPlayerView.ObservedPlayerController);
+                var inventorycontroller = Memory.ReadPtr(observedPlayerController + Offsets.ObservedPlayerController.InventoryController);
+                var inventory = Memory.ReadPtr(inventorycontroller + Offsets.InventoryController.Inventory);
+                var equipment = Memory.ReadPtr(inventory + Offsets.Inventory.Equipment);
+                slots = Memory.ReadPtr(equipment + Offsets.Equipment.Slots);
+                size = Memory.ReadValue<int>(slots + Offsets.UnityList.Count);
+            }
+            if (size == 0 || slots == 0) return;
 
             for (int slotID = 0; slotID < size; slotID++)
             {
@@ -48,27 +48,19 @@ namespace eft_dma_radar
             var gearDict = new Dictionary<string, GearItem>(StringComparer.OrdinalIgnoreCase);
             foreach (var slotName in slotDict.Keys)
             {
-                //Debug.WriteLine($"GearManager: Slot: {slotName}");
                 try
                 {
                     if (slotDict.TryGetValue(slotName, out var slot))
                     {
                         var containedItem = Memory.ReadPtr(slot + Offsets.Slot.ContainedItem);
-                        Debug.WriteLine($"GearManager: Slot: {slotName} 0x{slot:X} ContainedItem: 0x{containedItem:X}");
                         var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItemBase.ItemTemplate);
-                        Debug.WriteLine($"GearManager: InventoryTemplate: 0x{inventorytemplate:X}");
                         var idPtr = Memory.ReadPtr(inventorytemplate + Offsets.ItemTemplate.BsgId);
-                        Debug.WriteLine($"GearManager: ID: 0x{idPtr:X}");
                         var id = Memory.ReadUnityString(idPtr);
-                        Debug.WriteLine($"GearManager: ID: {id}");
-                        //Print all tarkovmanager items
 
                         if (TarkovMarketManager.AllItems.TryGetValue(id, out var entry))
                         {
                             string longName = entry.Item.name; // Contains 'full' item name
-                            Debug.WriteLine($"GearManager: LongName: {longName}");
                             string shortName = entry.Item.shortName; // Contains 'full' item name
-                            Debug.WriteLine($"GearManager: ShortName: {shortName}");
                             string extraSlotInfo = null; // Contains additional slot information (ammo type,etc.)
                             if (isPMC) // Only recurse further for PMCs (we don't care about P Scavs)
                             {
@@ -77,7 +69,7 @@ namespace eft_dma_radar
                                     try
                                     {
                                         var result = new PlayerWeaponInfo();
-                                        //RecurseSlotsForThermalsAmmo(containedItem, ref result); // Check weapon ammo type, and if it contains a thermal scope
+                                        RecurseSlotsForThermalsAmmo(containedItem, ref result); // Check weapon ammo type, and if it contains a thermal scope
                                         extraSlotInfo = result.ToString();
                                     }
                                     catch { }
@@ -102,10 +94,6 @@ namespace eft_dma_radar
                 catch { } // Skip over empty slots
             }
             Gear = new(gearDict); // update readonly ref
-            //foreach (var item in Gear)
-            //{
-                //Debug.WriteLine($"GearManager: Gear: {item}");
-            //}
         }
 
         /// <summary>
@@ -154,11 +142,8 @@ namespace eft_dma_radar
                             else // Not a magazine, keep recursing for a scope
                             {
                                 var inventorytemplate = Memory.ReadPtr(containedItem + Offsets.LootItemBase.ItemTemplate);
-                                Debug.WriteLine($"GearManager Scope: InventoryTemplate: 0x{inventorytemplate:X}");
                                 var idPtr = Memory.ReadPtr(inventorytemplate + Offsets.ItemTemplate.BsgId);
-                                Debug.WriteLine($"GearManager Scope: ID: 0x{idPtr:X}");
                                 var id = Memory.ReadUnityString(idPtr);
-                                Debug.WriteLine($"GearManager Scope: ID: {id}");
                                 if (id.Equals(reapIR, StringComparison.OrdinalIgnoreCase) ||
                                     id.Equals(flir, StringComparison.OrdinalIgnoreCase))
                                 {

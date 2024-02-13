@@ -320,7 +320,6 @@ namespace eft_dma_radar
                 if (pos is not null)
                 {
                     this.Position = (Vector3)pos; // Populate provided Position (usually only for a re-alloc)
-                    Debug.WriteLine($"Position set: {this.Position}");
                 }
                 if (baseClassName is null)
                 {
@@ -344,8 +343,8 @@ namespace eft_dma_radar
                     Lvl = GetPlayerLevel();
                     //Category = GetMemberCategory();
                     IsLocalPlayer = true;
-                    try { _gearManager = new GearManager(playerBase, false); } catch { }
                     IsPmc = true;
+                    try { _gearManager = new GearManager(playerBase, IsPmc, true); } catch { }
 
                 } else if (baseClassName == "ObservedPlayerView") {
                     IsLocalPlayer = false;
@@ -360,7 +359,6 @@ namespace eft_dma_radar
                     var playerSide = GetNextObservedPlayerSide();
                     var playerIsAI = GetNextObservedPlayerIsAI();
                     // Check corpse ptr
-                    try { _gearManager = new GearManager(playerBase, false); } catch { }
                     if (nameTranslations.ContainsKey(Name))
                     {
                         Name = nameTranslations[Name];
@@ -368,15 +366,18 @@ namespace eft_dma_radar
                     if (playerSide == 1 && playerIsAI == false) {
                         Type = PlayerType.USEC;
                         IsPmc = true;
+                        try { _gearManager = new GearManager(playerBase, true, false); } catch { }
                         
                     }
                     else if (playerSide == 2 && playerIsAI == false)
                     {
                         Type = PlayerType.BEAR;
                         IsPmc = true;
+                        try { _gearManager = new GearManager(playerBase, true, false); } catch { }
                     }
                     else if (playerSide == 4 && playerIsAI == false) {
                         Type = PlayerType.PScav;
+                        try { _gearManager = new GearManager(playerBase, true, false); } catch { }
                     } else if (playerSide == 4 && playerIsAI == true) {
                         if (nameTranslations.ContainsKey(nameForBossCheck))
                         {

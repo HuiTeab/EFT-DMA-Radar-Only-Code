@@ -131,8 +131,27 @@ namespace eft_dma_radar {
                             //Not to be confused with found in raid items
                             //var spawnedIn = Memory.ReadValue<bool>(item + 0x6C);
                             //Console.WriteLine("Quest Item spawned: " + spawnedIn);
-                            //var itemName = Memory.ReadUnityString(itemTemplate + 0x10);
-                            //Console.WriteLine("Q Item name: "+ itemName);
+                            var descPtr = Memory.ReadPtr(itemTemplate + 0x18);
+                            var itemName = Memory.ReadUnityString(descPtr);
+                            if (itemName == null) return;
+                            if (itemName == "item_barter_electr_gphonex") {
+                                var objectClass = Memory.ReadPtr(gameObject + Offsets.GameObject.ObjectClass);
+                                var transformInternal = Memory.ReadPtrChain(objectClass, Offsets.LootGameObjectClass.To_TransformInternal);
+                                var pos = new Transform(transformInternal).GetPosition();
+                                var BSGIdPtr = Memory.ReadPtr(itemTemplate + Offsets.ItemTemplate.BsgId);
+                                var id = Memory.ReadUnityString(BSGIdPtr);
+                                //Console.WriteLine("Found GPhone X at " + pos + " with ID " + id);
+                                if (TarkovMarketManager.AllItems.TryGetValue(id, out
+                                        var entry)) {
+                                    loot.Add(new LootItem {
+                                        Label = entry.Label,
+                                            AlwaysShow = true,
+                                            Important = true,
+                                            Position = pos,
+                                            Item = entry.Item
+                                    });
+                                }
+                            }
 
                         }
                         else {
