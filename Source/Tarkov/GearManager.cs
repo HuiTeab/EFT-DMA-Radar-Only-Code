@@ -29,11 +29,11 @@ namespace eft_dma_radar
 
             } else {
                 var observedPlayerController = Memory.ReadPtr(playerBase + Offsets.ObservedPlayerView.ObservedPlayerController);
-                Console.WriteLine($"ObservedPlayerController: {observedPlayerController}");
+                //Console.WriteLine($"ObservedPlayerController: {observedPlayerController}");
                 var inventorycontroller = Memory.ReadPtr(observedPlayerController + Offsets.ObservedPlayerController.InventoryController);
-                Console.WriteLine($"InventoryController: {inventorycontroller}");
+                //Console.WriteLine($"InventoryController: {inventorycontroller}");
                 var inventory = Memory.ReadPtr(inventorycontroller + Offsets.InventoryController.ObservedPlayerInventory);
-                Console.WriteLine($"Inventory: {inventory}");
+                //Console.WriteLine($"Inventory: {inventory}");
                 var equipment = Memory.ReadPtr(inventory + Offsets.Inventory.Equipment);
                 slots = Memory.ReadPtr(equipment + Offsets.Equipment.Slots);
                 size = Memory.ReadValue<int>(slots + Offsets.UnityList.Count);
