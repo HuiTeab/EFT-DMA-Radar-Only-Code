@@ -155,7 +155,6 @@ namespace eft_dma_radar
             }
             else
             {
-                //Debug.WriteLine($"ERROR: Unknown player type: {classNameString}");
                 id = null;
             }
 
@@ -166,12 +165,11 @@ namespace eft_dma_radar
 
         private void ProcessPlayer(int index, ScatterReadMap scatterMap, HashSet<string> registered)
         {
-            //Debug.WriteLine($"UpdateList: Processing player {index + 1}.");
+            //Console.WriteLine($"UpdateList: Processing player {index + 1}.");
 
             try
             {
                 var playerBase = (ulong)scatterMap.Results[index][0].Result;
-                //Debug.WriteLine($"PlayerBase: {playerBase:X}");
                 var playerProfile = 0ul;
                 (string playerId, string className) = GetPlayerIdFromBase(playerBase);
                 if (playerId.Length != 24 && playerId.Length != 36) throw new ArgumentOutOfRangeException("id"); // Ensure valid ID length
@@ -179,7 +177,6 @@ namespace eft_dma_radar
                 {
                     if (className == "ClientPlayer" || className == "LocalPlayer" || className == "HideoutPlayer")
                     {
-                        //Console.WriteLine($"Player '{player.Name}' is local player.");
                         playerProfile = Memory.ReadPtr(playerBase + Offsets.Player.Profile);
 
                     }
@@ -440,6 +437,20 @@ namespace eft_dma_radar
                                 var verticesAddr = round2?.AddEntry(i,13,hierarchy,typeof(ulong),null,Offsets.TransformHierarchy.Vertices);
                             }
                             //var corpse = round1.AddEntry(i, 10, player.CorpsePtr, typeof(ulong));
+                        }
+                        else if (player.Type is PlayerType.AIScav) {
+                            var rotation = round1.AddEntry(i,7,player.MovementContext + Offsets.MovementContext.Rotation,typeof(System.Numerics.Vector2),null);
+                            var posAddr = player.TransformScatterReadParameters;
+                            var indices = round1.AddEntry(i,8,posAddr.Item1,typeof(List<int>),posAddr.Item2);
+                            indices.SizeMult = 4;
+                            var vertices = round1.AddEntry(i,9,posAddr.Item3,typeof(List<Vector128<float>>),posAddr.Item4);
+                            vertices.SizeMult = 16;
+                            if (checkPos && player.IsHumanActive)
+                            {
+                                var hierarchy = round1.AddEntry(i,11,player.TransformInternal,typeof(ulong),null,Offsets.TransformInternal.Hierarchy);
+                                var indicesAddr = round2?.AddEntry(i,12,hierarchy,typeof(ulong),null,Offsets.TransformHierarchy.Indices);
+                                var verticesAddr = round2?.AddEntry(i,13,hierarchy,typeof(ulong),null,Offsets.TransformHierarchy.Vertices);
+                            }
                         }
                         else //if (player.Type is PlayerType.PMC or PlayerType.USEC or PlayerType.BEAR or PlayerType.AIScav)
                         {

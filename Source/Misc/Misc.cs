@@ -128,7 +128,7 @@ namespace eft_dma_radar
             LoggingEnabled = false;
             MaxDistance = 325;
             AimViewFOV = 30;
-            MinLootValue = 50000;
+            MinLootValue = 90000;
             MinImportantLootValue = 300000;
             PrimaryTeammateId = null;
         }

@@ -131,6 +131,7 @@ namespace eft_dma_radar {
                             //Not to be confused with found in raid items
                             //var spawnedIn = Memory.ReadValue<bool>(item + 0x6C);
                             //Console.WriteLine("Quest Item spawned: " + spawnedIn);
+                            //This is not correct method to set quest items. WIP
                             var descPtr = Memory.ReadPtr(itemTemplate + 0x18);
                             var itemName = Memory.ReadUnityString(descPtr);
                             if (itemName == null) return;
