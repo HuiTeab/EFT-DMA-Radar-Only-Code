@@ -139,9 +139,17 @@ namespace eft_dma_radar
                 _mapName = string.Empty;
                 return;
             }
-            var mapNamePrt = Memory.ReadPtr(_localGameWorld + 0x40);
-            var mapName = Memory.ReadUnityString(mapNamePrt);
-            _mapName = mapName;
+            var classNamePtr = Memory.ReadPtrChain(_localGameWorld, Offsets.UnityClass.Name);
+            var classNameString = Memory.ReadString(classNamePtr, 64).Replace("\0", string.Empty);
+            if (classNameString == "ClientLocalGameWorld") {
+                var mapNamePrt = Memory.ReadPtrChain(_localGameWorld, new uint[] { 0x148, 0x550 });
+                var mapName = Memory.ReadUnityString(mapNamePrt);
+                _mapName = mapName;
+            } else {
+                var mapNamePrt = Memory.ReadPtr(_localGameWorld + 0x40);
+                var mapName = Memory.ReadUnityString(mapNamePrt);
+                _mapName = mapName;
+            }
         }
 
         /// <summary>
@@ -290,9 +298,9 @@ namespace eft_dma_radar
                         retryCount++;
                         continue;
                     }
-                    var localPlayer = Memory.ReadPtr(_localGameWorld + 0x148);
-                    var localPlayerInfo = Memory.ReadPtrChain(localPlayer, new uint[] {0x588, 0x28});
-                    var localPlayeSide = Memory.ReadValue<int>(localPlayerInfo + 0x70);
+                    var localPlayer = Memory.ReadPtr(_localGameWorld + Offsets.LocalGameWorld.MainPlayer);
+                    var localPlayerInfo = Memory.ReadPtrChain(localPlayer, new uint[] {Offsets.Player.Profile, Offsets.Profile.PlayerInfo});
+                    var localPlayeSide = Memory.ReadValue<int>(localPlayerInfo + Offsets.PlayerInfo.PlayerSide);
                     if (localPlayeSide == 4)
                     {
                         _isScav = true;
@@ -301,6 +309,8 @@ namespace eft_dma_radar
                     {
                         _isScav = false;
                     }
+                    var localGameWorldClassnamePtr = Memory.ReadPtrChain(_localGameWorld, Offsets.UnityClass.Name);
+                    var localGameWorldClassName = Memory.ReadString(localGameWorldClassnamePtr, 64).Replace("\0", string.Empty);
                     var localPlayerClassnamePtr = Memory.ReadPtrChain(localPlayer, Offsets.UnityClass.Name);
                     var classNameString = Memory.ReadString(localPlayerClassnamePtr, 64).Replace("\0", string.Empty);
                     //Hideout handling
@@ -312,17 +322,30 @@ namespace eft_dma_radar
                         //Should skip loot, grenades, exfils, etc. But should still keep gearmanager
                         return true;
                     }
-                    //Online and offline handling
-                    else if (classNameString == "ClientPlayer" || classNameString == "LocalPlayer")
+                    //Online handling
+                    else if (classNameString == "ClientPlayer" || classNameString == "LocalPlayer" && localGameWorldClassName != "ClientLocalGameWorld")
                     {
                         _inHideout = false;
-                        // Check side
-                        //var side = Memory.ReadValue<int>(localPlayer + Offsets.LocalPlayer.Side);
                         var rgtPlayers = new RegisteredPlayers(Memory.ReadPtr(_localGameWorld + Offsets.LocalGameWorld.RegisteredPlayers));
                         // retry if player count is 0
                         if (rgtPlayers.PlayerCount == 0)
                         {
-                            Program.Log("ERROR - Registered Players is null. Retrying...");
+                            Console.WriteLine("Player count is 0. Retrying...");
+                            await Task.Delay(retryInterval);
+                            retryCount++;
+                            continue;
+                        }
+
+                        _rgtPlayers = rgtPlayers;
+                        return true; // Successful exit
+                    }
+                    //Offline handling
+                    else if (localGameWorldClassName == "ClientLocalGameWorld") {
+                        _inHideout = false;
+                        var rgtPlayers = new RegisteredPlayers(Memory.ReadPtr(_localGameWorld + Offsets.LocalGameWorld.RegisteredPlayers));
+                        if (rgtPlayers.PlayerCount == 0)
+                        {
+                            Console.WriteLine("Player count is 0. Retrying...");
                             await Task.Delay(retryInterval);
                             retryCount++;
                             continue;

@@ -54,7 +54,7 @@
     {
         public const uint List = 0x18; // to UnityList
     }
-    public struct Player // EFT.Player : MonoBehaviour, GInterface3EB2, GInterface457E, GInterface4579, GInterface4583, GInterface45BA, GInterface8D68, IDissonancePlayer
+    public struct Player // EFT.Player : MonoBehaviour, 
     {
         //public static readonly uint[] To_TransformInternal = new uint[] { 0xA8, 0x28, 0x28, 0x10, 0x20, 0x10 }; // to TransformInternal
         public static readonly uint[] To_TransformInternal = new uint[] { 0xA8, 0x28, 0x28, 0x10, 0x20 + (0 * 0x8), 0x10 }; // to TransformInternal
@@ -85,6 +85,7 @@
         public const uint Nickname = 0x10; // unity string
         public const uint MainProfileNickname = 0x18; // unity string
         public const uint GroupId = 0x20; // ptr to UnityString (0/null if solo or bot)
+        public const uint GameVersion = 0x38; // unity string
         public const uint Settings = 0x50; // to PlayerSettings
         public const uint PlayerSide = 0x70; // int32
         public const uint RegDate = 0x74; // int32

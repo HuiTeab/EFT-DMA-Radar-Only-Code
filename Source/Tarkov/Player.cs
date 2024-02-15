@@ -334,17 +334,27 @@ namespace eft_dma_radar
                     MovementContext = Memory.ReadPtr(playerBase + Offsets.Player.MovementContext);
                     TransformInternal = Memory.ReadPtrChain(playerBase, Offsets.Player.To_TransformInternal);
                     _transform = new Transform(TransformInternal, true);
-
-                    GroupID = GetGroupID();
-                    Type = PlayerType.LocalPlayer;
-                    //AccountID = GetAccountID();
                     var namePtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.Nickname);
                     Name = Memory.ReadUnityString(namePtr);
-                    Lvl = GetPlayerLevel();
-                    //Category = GetMemberCategory();
-                    IsLocalPlayer = true;
-                    IsPmc = true;
-                    try { _gearManager = new GearManager(playerBase, IsPmc, true); } catch { }
+                    try {
+                        var gameVersionPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.GameVersion);
+                        var gameVersion = Memory.ReadUnityString(gameVersionPtr);
+                        //If empty, then it's a scav
+                        if (gameVersion == "")
+                        {
+                            Type = PlayerType.AIScav;
+                            Name = TransliterateCyrillic(Name);
+                        }
+                        else
+                        {
+                            Type = PlayerType.LocalPlayer;
+                            IsLocalPlayer = true;
+                            IsPmc = true;
+                            try { _gearManager = new GearManager(playerBase, true, true); } catch { }
+                            GroupID = GetGroupID();
+                        }
+                    }catch {}
+                    //Lvl = GetPlayerLevel();
 
                 } else if (baseClassName == "ObservedPlayerView") {
                     IsLocalPlayer = false;
