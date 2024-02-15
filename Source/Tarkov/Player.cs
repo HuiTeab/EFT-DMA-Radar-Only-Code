@@ -178,10 +178,10 @@ namespace eft_dma_radar
         /// </summary>
         public bool IsHumanHostileActive
         {
-            get => ((Type is PlayerType.PMC ||
+            get => (Type is PlayerType.BEAR || Type is PlayerType.USEC ||
                     Type is PlayerType.SpecialPlayer ||
                     Type is PlayerType.PScav)
-                    && IsActive && IsAlive);
+                    && IsActive && IsAlive;
         }
         /// <summary>
         /// Player is friendly to LocalPlayer (including LocalPlayer) and Active/Alive.
@@ -335,7 +335,7 @@ namespace eft_dma_radar
                     TransformInternal = Memory.ReadPtrChain(playerBase, Offsets.Player.To_TransformInternal);
                     _transform = new Transform(TransformInternal, true);
 
-                    //GroupID = GetGroupID();
+                    GroupID = GetGroupID();
                     Type = PlayerType.LocalPlayer;
                     //AccountID = GetAccountID();
                     var namePtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.Nickname);
@@ -356,6 +356,7 @@ namespace eft_dma_radar
                     Name = Memory.ReadUnityString(Memory.ReadPtr(ObservedPlayerView + Offsets.ObservedPlayerView.NickName));
                     var nameForBossCheck = Name;
                     Name = TransliterateCyrillic(Name);
+                    Info = ObservedPlayerView;
                     var playerSide = GetNextObservedPlayerSide();
                     var playerIsAI = GetNextObservedPlayerIsAI();
                     // Check corpse ptr
@@ -367,6 +368,7 @@ namespace eft_dma_radar
                         Type = PlayerType.USEC;
                         IsPmc = true;
                         try { _gearManager = new GearManager(playerBase, true, false); } catch { }
+                        GroupID = GetObservedPlayerGroupID();
                         
                     }
                     else if (playerSide == 2 && playerIsAI == false)
@@ -374,10 +376,12 @@ namespace eft_dma_radar
                         Type = PlayerType.BEAR;
                         IsPmc = true;
                         try { _gearManager = new GearManager(playerBase, true, false); } catch { }
+                        GroupID = GetObservedPlayerGroupID();
                     }
                     else if (playerSide == 4 && playerIsAI == false) {
                         Type = PlayerType.PScav;
                         try { _gearManager = new GearManager(playerBase, true, false); } catch { }
+                        GroupID = GetObservedPlayerGroupID();
                     } else if (playerSide == 4 && playerIsAI == true) {
                         if (nameTranslations.ContainsKey(nameForBossCheck))
                         {
@@ -563,9 +567,7 @@ namespace eft_dma_radar
         private string GetAccountID()
         {
             var idPtr = Memory.ReadPtr(Profile + Offsets.Profile.AccountId);
-            //Debug.WriteLine($"Account ID Pointer: 0x{idPtr:X}");
             var id = Memory.ReadUnityString(idPtr);
-            //Debug.WriteLine($"Account ID: {id}");
             return id;
         }
 
@@ -587,6 +589,17 @@ namespace eft_dma_radar
             try
             {
                 var grpPtr = Memory.ReadPtr(Info + Offsets.PlayerInfo.GroupId);
+                var grp = Memory.ReadUnityString(grpPtr);
+                _groups.TryAdd(grp, _groups.Count);
+                return _groups[grp];
+            }
+            catch { return -1; } // will return null if Solo / Don't have a team
+        }
+        private int GetObservedPlayerGroupID()
+        {
+            try
+            {
+                var grpPtr = Memory.ReadPtr(Info + 0x18);
                 var grp = Memory.ReadUnityString(grpPtr);
                 _groups.TryAdd(grp, _groups.Count);
                 return _groups[grp];

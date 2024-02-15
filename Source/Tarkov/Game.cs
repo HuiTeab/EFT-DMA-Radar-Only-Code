@@ -141,7 +141,6 @@ namespace eft_dma_radar
             }
             var mapNamePrt = Memory.ReadPtr(_localGameWorld + 0x40);
             var mapName = Memory.ReadUnityString(mapNamePrt);
-            Console.WriteLine($"Map Name: {mapName}");
             _mapName = mapName;
         }
 
