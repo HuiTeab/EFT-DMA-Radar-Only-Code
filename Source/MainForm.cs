@@ -775,13 +775,18 @@ namespace eft_dma_radar
         /// </summary>
         private bool IsItemImportant(LootItem item)
         {
+            var value = Math.Max(item.Item.avg24hPrice.Value, item.Item.basePrice);
+            
             if (_filterEntry is null || _filterEntry.Trim() == string.Empty)
             {
-                var value = Math.Max((byte)item.Item.avg24hPrice, item.Item.basePrice);
                 if (item.Important || value >= _config.MinImportantLootValue)
+                {
                     return true;
+                }
                 else
+                {
                     return false;
+                }
             }
             if (item.Important)
                 return true;
