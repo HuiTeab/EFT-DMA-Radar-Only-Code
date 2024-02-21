@@ -85,7 +85,7 @@ namespace eft_dma_radar
                 if (!File.Exists("mmap.txt"))
                 {
                     Program.Log("No MemMap, attempting to generate...");
-                    if (!vmm.Initialize("-printf", "-v", "-device", "FPGA"))
+                    if (!vmm.Initialize("-printf", "-v", "-device", "FPGA", "-waitinitialize"))
                         throw new DMAException("Unable to initialize DMA Device while attempting to generate MemMap!");
                     GetMemMap();
                     vmm.Close(); // Close back down, re-init w/ map
