@@ -33,8 +33,13 @@ EFT DMA Radar is a radar tool designed for Escape from Tarkov that provides real
 ## Dependencies
 
 - FTD3XX.dll - https://ftdichip.com/drivers/d3xx-drivers/
+<<<<<<< HEAD
 - leechcore.dll, vmm.dll, dbghelp.dll, symsrv.dll and vcruntime140.dll - https://github.com/ufrisk/MemProcFS/releases/tag/v4.6
 
+=======
+- leechcore.dll - https://github.com/ufrisk/MemProcFS
+- vmm.dll - https://github.com/ufrisk/MemProcFS
+>>>>>>> de61ce76956355f0dea8990f2b54f146cb180bd2
 
 ## Contact
 
