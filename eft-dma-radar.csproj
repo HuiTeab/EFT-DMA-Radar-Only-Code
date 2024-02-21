@@ -16,36 +16,8 @@
     <None Remove="dbghelp.dll" />
     <None Remove="FTD3XX.dll" />
     <None Remove="leechcore.dll" />
-    <None Remove="libSkiaSharp.dll" />
     <None Remove="Maps\Customs.json" />
     <None Remove="Maps\Customs.png" />
-    <None Remove="Maps\Factory.json" />
-    <None Remove="Maps\Factory_0f.png" />
-    <None Remove="Maps\Factory_base.png" />
-    <None Remove="Maps\GroundZero-1f.jpg" />
-    <None Remove="Maps\GroundZero.json" />
-    <None Remove="Maps\GroundZero1f.jpg" />
-    <None Remove="Maps\GroundZero2f.jpg" />
-    <None Remove="Maps\GroundZero3f.jpg" />
-    <None Remove="Maps\Interchange.json" />
-    <None Remove="Maps\Interchange_0f.png" />
-    <None Remove="Maps\Interchange_1f.png" />
-    <None Remove="Maps\Interchange_2f.png" />
-    <None Remove="Maps\Labs.json" />
-    <None Remove="Maps\Labs_0f.png" />
-    <None Remove="Maps\Labs_1f.png" />
-    <None Remove="Maps\Labs_2f.png" />
-    <None Remove="Maps\Lighthouse.json" />
-    <None Remove="Maps\Lighthouse.png" />
-    <None Remove="Maps\Reserve.json" />
-    <None Remove="Maps\Reserve_0f.png" />
-    <None Remove="Maps\Reserve_base.png" />
-    <None Remove="Maps\Shoreline.json" />
-    <None Remove="Maps\Shoreline.png" />
-    <None Remove="Maps\Streets.json" />
-    <None Remove="Maps\Streets.png" />
-    <None Remove="Maps\Woods.json" />
-    <None Remove="Maps\Woods.png" />
     <None Remove="symsrv.dll" />
     <None Remove="vcruntime140.dll" />
     <None Remove="vmm.dll" />
@@ -61,94 +33,10 @@
     <Content Include="leechcore.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="libSkiaSharp.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Maps\Customs.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Maps\Customs.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Factory.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Factory_0f.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Factory_base.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\GroundZero-1f.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\GroundZero.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\GroundZero1f.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\GroundZero2f.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\GroundZero3f.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Interchange.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Interchange_0f.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Interchange_1f.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Interchange_2f.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Labs.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Labs_0f.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Labs_1f.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Labs_2f.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Lighthouse.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Lighthouse.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Reserve.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Reserve_0f.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Reserve_base.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Shoreline.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Shoreline.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Streets.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Streets.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Woods.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\Woods.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="symsrv.dll">
